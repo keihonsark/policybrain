@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 
 const APP_URL = 'https://app.policybrain.app';
+const SIGNIN_URL = 'https://app.policybrain.app/login?from_url=https%3A%2F%2Fapp.policybrain.app%2Fdashboard';
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -42,7 +43,7 @@ export default function Home() {
           </ul>
 
           <div className="nav-cta">
-            <a href={APP_URL} className="nav-signin">Sign In</a>
+            <a href={SIGNIN_URL} className="nav-signin">Sign In</a>
             <a href={APP_URL} className="btn btn-primary">Get Started →</a>
             <button
               className={`hamburger ${menuOpen ? 'open' : ''}`}
@@ -59,7 +60,7 @@ export default function Home() {
           <a href="#features" onClick={() => setMenuOpen(false)}>Features</a>
           <a href="#how-it-works" onClick={() => setMenuOpen(false)}>How it works</a>
           <a href="#pricing" onClick={() => setMenuOpen(false)}>Pricing</a>
-          <a href={APP_URL}>Sign In</a>
+          <a href={SIGNIN_URL}>Sign In</a>
           <a href={APP_URL} className="btn btn-primary">Get Started →</a>
         </div>
       </nav>

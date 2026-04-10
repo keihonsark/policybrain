@@ -5,6 +5,9 @@ import { useEffect, useRef, useState } from 'react';
 const APP_URL = 'https://app.policybrain.app';
 const SIGNIN_URL = 'https://app.policybrain.app/login?from_url=https%3A%2F%2Fapp.policybrain.app%2Fdashboard';
 
+const ROTATING_WORDS = ['One Place.', 'One System.', 'One Dashboard.', 'Under Control.'];
+const ROTATING_LOOP = [...ROTATING_WORDS, ROTATING_WORDS[0]];
+
 function Counter({ end, duration = 1500, prefix = '', suffix = '' }) {
   const [val, setVal] = useState(0);
   const ref = useRef(null);
@@ -53,6 +56,28 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [progress, setProgress] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [wordIndex, setWordIndex] = useState(0);
+  const [noWordTransition, setNoWordTransition] = useState(false);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setWordIndex((prev) => prev + 1);
+    }, 3000);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    if (wordIndex >= ROTATING_WORDS.length) {
+      const t = setTimeout(() => {
+        setNoWordTransition(true);
+        setWordIndex(0);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => setNoWordTransition(false));
+        });
+      }, 650);
+      return () => clearTimeout(t);
+    }
+  }, [wordIndex]);
 
   useEffect(() => {
     setMounted(true);
@@ -175,7 +200,23 @@ export default function Home() {
             </div>
             <h1 className="hero-title">
               <span className="line"><span className="line-inner">All Your Policies.</span></span>
-              <span className="line"><span className="line-inner gradient-text">One Place.</span></span>
+              <span className="line rotating-line">
+                <span className="rotating-reveal">
+                  <span
+                    className="rotating-inner"
+                    style={{
+                      transform: `translateY(-${wordIndex * 1.05}em)`,
+                      transition: noWordTransition
+                        ? 'none'
+                        : 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                    }}
+                  >
+                    {ROTATING_LOOP.map((w, i) => (
+                      <span key={i} className="rotating-word">{w}</span>
+                    ))}
+                  </span>
+                </span>
+              </span>
             </h1>
             <p className="hero-sub">
               Stop digging through email folders and spreadsheets. PolicyBrain

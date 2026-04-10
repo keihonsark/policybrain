@@ -259,14 +259,35 @@ section {
 }
 
 .btn-primary {
-  background: var(--gradient);
+  background: linear-gradient(135deg, #06b6d4, #22d3ee, #67e8f9, #06b6d4);
+  background-size: 300% 300%;
   color: #0a0e1a;
-  box-shadow: 0 4px 24px rgba(34, 211, 238, 0.25);
+  animation:
+    gradientShift 3s ease infinite,
+    buttonGlow 2s ease-in-out infinite alternate;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(34, 211, 238, 0.4);
+  animation:
+    gradientShift 2s ease infinite,
+    buttonGlowHover 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes buttonGlow {
+  from { box-shadow: 0 4px 20px rgba(34, 211, 238, 0.25); }
+  to { box-shadow: 0 6px 30px rgba(34, 211, 238, 0.45); }
+}
+
+@keyframes buttonGlowHover {
+  from { box-shadow: 0 6px 28px rgba(34, 211, 238, 0.4); }
+  to { box-shadow: 0 12px 44px rgba(34, 211, 238, 0.6); }
 }
 
 .btn-secondary {
@@ -418,6 +439,45 @@ section {
 
 .hero-title .line:nth-child(1) .line-inner { animation-delay: 0.25s; }
 .hero-title .line:nth-child(2) .line-inner { animation-delay: 0.4s; }
+
+/* Rotating word strip */
+.hero-title .rotating-line {
+  display: block;
+  overflow: hidden;
+  height: 1.15em;
+  vertical-align: top;
+  padding-bottom: 0.1em;
+}
+
+.rotating-reveal {
+  display: block;
+  transform: translateY(110%);
+  animation: heroReveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.4s forwards;
+  will-change: transform;
+}
+
+.rotating-inner {
+  display: block;
+  will-change: transform;
+}
+
+.rotating-word {
+  display: block;
+  line-height: 1.05;
+  height: 1.05em;
+  background: linear-gradient(135deg, #06b6d4, #22d3ee, #67e8f9);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: gradientShimmer 3s ease infinite alternate;
+}
+
+@keyframes gradientShimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
 
 .hero-sub {
   opacity: 0;

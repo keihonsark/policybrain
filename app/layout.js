@@ -15,6 +15,10 @@ export const metadata = {
     title: 'PolicyBrain — All Your Policies. One Place.',
     description: 'Organize every insurance policy across your entities, assets, and renewals in one modern dashboard.',
   },
+  icons: {
+    icon: '/images/logo.png',
+    apple: '/images/logo.png',
+  },
 };
 
 export default function RootLayout({ children }) {

@@ -175,18 +175,16 @@ section {
   letter-spacing: -0.02em;
 }
 
-.logo-mark {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: var(--gradient);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #0a0e1a;
-  font-weight: 800;
-  font-size: 16px;
-  box-shadow: 0 4px 20px rgba(34, 211, 238, 0.3);
+.logo-img {
+  height: 34px;
+  width: auto;
+  display: block;
+  filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.4));
+  transition: filter 0.3s ease;
+}
+
+.logo:hover .logo-img {
+  filter: drop-shadow(0 0 14px rgba(34, 211, 238, 0.6));
 }
 
 .nav-links {
@@ -322,6 +320,32 @@ section {
   inset: 0;
   pointer-events: none;
   z-index: 0;
+}
+
+.hero-logo-watermark {
+  position: absolute;
+  right: 4%;
+  top: 50%;
+  width: 360px;
+  height: auto;
+  opacity: 0.06;
+  pointer-events: none;
+  z-index: 0;
+  transform-origin: center center;
+  animation:
+    watermarkPulse 4s ease-in-out infinite alternate,
+    watermarkSpin 60s linear infinite;
+  will-change: transform, filter;
+}
+
+@keyframes watermarkPulse {
+  from { filter: drop-shadow(0 0 40px rgba(34, 211, 238, 0.1)); }
+  to { filter: drop-shadow(0 0 80px rgba(34, 211, 238, 0.2)); }
+}
+
+@keyframes watermarkSpin {
+  from { transform: translateY(-50%) rotate(0deg); }
+  to { transform: translateY(-50%) rotate(360deg); }
 }
 
 .orb {
@@ -1216,6 +1240,22 @@ h1 {
   pointer-events: none;
 }
 
+.cta-logo {
+  position: relative;
+  width: 60px;
+  height: auto;
+  margin: 0 auto 1.5rem;
+  display: block;
+  filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.5));
+  animation: ctaLogoFloat 3s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes ctaLogoFloat {
+  from { transform: translateY(0); }
+  to { transform: translateY(-8px); }
+}
+
 .cta-banner h2 {
   position: relative;
   font-size: clamp(28px, 4vw, 44px);
@@ -1247,6 +1287,16 @@ h1 {
 .footer-copy {
   font-size: 13px;
   color: var(--dim);
+  display: inline-flex;
+  align-items: center;
+}
+
+.footer-logo {
+  width: 20px;
+  height: auto;
+  margin-right: 8px;
+  opacity: 0.7;
+  filter: drop-shadow(0 0 6px rgba(34, 211, 238, 0.3));
 }
 
 .footer-links {
@@ -1310,6 +1360,10 @@ h1 {
 }
 
 @media (max-width: 900px) {
+  .hero-logo-watermark {
+    display: none;
+  }
+
   section {
     padding: 80px 0;
   }

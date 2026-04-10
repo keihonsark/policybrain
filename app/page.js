@@ -142,7 +142,7 @@ export default function Home() {
       <nav className="nav">
         <div className="nav-inner">
           <a href="/" className="logo">
-            <span className="logo-mark">P</span>
+            <img src="/images/logo.png" alt="" className="logo-img" />
             <span>PolicyBrain</span>
           </a>
 
@@ -189,6 +189,13 @@ export default function Home() {
             <span key={p.key} className="particle" style={p.style} />
           ))}
         </div>
+
+        <img
+          src="/images/logo.png"
+          alt=""
+          aria-hidden="true"
+          className="hero-logo-watermark"
+        />
 
         <div className="container hero-inner">
           <div className="hero-content">
@@ -501,6 +508,7 @@ export default function Home() {
       <section>
         <div className="container">
           <div className="cta-banner fade-in">
+            <img src="/images/logo.png" alt="" className="cta-logo" />
             <h2>Your insurance deserves a system, not a spreadsheet.</h2>
             <a href={APP_URL} className="btn btn-primary btn-lg">Get Started Free →</a>
           </div>
@@ -510,7 +518,10 @@ export default function Home() {
       {/* FOOTER */}
       <footer className="footer">
         <div className="container footer-inner">
-          <div className="footer-copy">© 2026 PolicyBrain. All rights reserved.</div>
+          <div className="footer-copy">
+            <img src="/images/logo.png" alt="" className="footer-logo" />
+            © 2026 PolicyBrain. All rights reserved.
+          </div>
           <ul className="footer-links">
             <li><a href="https://app.policybrain.app/legal/terms">Terms</a></li>
             <li><a href="https://app.policybrain.app/legal/general-terms">General Terms</a></li>

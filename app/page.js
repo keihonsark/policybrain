@@ -1,14 +1,62 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const APP_URL = 'https://app.policybrain.app';
 const SIGNIN_URL = 'https://app.policybrain.app/login?from_url=https%3A%2F%2Fapp.policybrain.app%2Fdashboard';
 
-export default function Home() {
-  const [menuOpen, setMenuOpen] = useState(false);
+function Counter({ end, duration = 1500, prefix = '', suffix = '' }) {
+  const [val, setVal] = useState(0);
+  const ref = useRef(null);
 
   useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    let started = false;
+    let rafId;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !started) {
+            started = true;
+            const start = performance.now();
+            const tick = (now) => {
+              const t = Math.min(1, (now - start) / duration);
+              const eased = 1 - Math.pow(1 - t, 3);
+              setVal(end * eased);
+              if (t < 1) rafId = requestAnimationFrame(tick);
+            };
+            rafId = requestAnimationFrame(tick);
+            obs.disconnect();
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+    obs.observe(node);
+    return () => {
+      obs.disconnect();
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, [end, duration]);
+
+  return (
+    <span ref={ref}>
+      {prefix}
+      {Math.round(val)}
+      {suffix}
+    </span>
+  );
+}
+
+export default function Home() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -23,11 +71,48 @@ export default function Home() {
 
     document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
 
-    return () => observer.disconnect();
+    let rafId = null;
+    const onScroll = () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        const h = document.documentElement;
+        const total = h.scrollHeight - h.clientHeight;
+        setProgress(total > 0 ? (h.scrollTop / total) * 100 : 0);
+        rafId = null;
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', onScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
+
+  const particles = mounted
+    ? Array.from({ length: 18 }, (_, i) => {
+        const size = 2 + Math.random() * 2;
+        return {
+          key: i,
+          style: {
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            width: `${size}px`,
+            height: `${size}px`,
+            animationDuration: `${15 + Math.random() * 25}s`,
+            animationDelay: `${-Math.random() * 20}s`,
+          },
+        };
+      })
+    : [];
 
   return (
     <>
+      {/* SCROLL PROGRESS BAR */}
+      <div className="scroll-progress" style={{ width: `${progress}%` }} />
+
       {/* NAV */}
       <nav className="nav">
         <div className="nav-inner">
@@ -71,86 +156,100 @@ export default function Home() {
           <div className="orb orb-1"></div>
           <div className="orb orb-2"></div>
           <div className="orb orb-3"></div>
+          <div className="orb orb-4"></div>
         </div>
+
+        <div className="particles" aria-hidden="true">
+          {particles.map((p) => (
+            <span key={p.key} className="particle" style={p.style} />
+          ))}
+        </div>
+
         <div className="container hero-inner">
           <div className="hero-content">
-            <div className="badge fade-in">
-              <span className="badge-dot"></span>
-              Insurance Organization Platform
+            <div className="hero-badge-wrap">
+              <div className="badge">
+                <span className="badge-dot"></span>
+                Insurance Organization Platform
+              </div>
             </div>
-            <h1 className="fade-in">
-              All Your Policies.<br />
-              <span className="gradient-text">One Place.</span>
+            <h1 className="hero-title">
+              <span className="line"><span className="line-inner">All Your Policies.</span></span>
+              <span className="line"><span className="line-inner gradient-text">One Place.</span></span>
             </h1>
-            <p className="hero-sub fade-in">
+            <p className="hero-sub">
               Stop digging through email folders and spreadsheets. PolicyBrain
               organizes every policy across your entities, assets, and renewals
               in one modern dashboard.
             </p>
-            <div className="hero-buttons fade-in">
+            <div className="hero-buttons">
               <a href={APP_URL} className="btn btn-primary btn-lg">Get Started Free →</a>
               <a href="#pricing" className="btn btn-secondary btn-lg">View Pricing</a>
             </div>
           </div>
 
           {/* DASHBOARD MOCKUP */}
-          <div className="mockup fade-in">
-            <div className="browser-chrome">
-              <div className="browser-dots">
-                <span></span><span></span><span></span>
-              </div>
-              <div className="browser-url">app.policybrain.app — Dashboard</div>
-            </div>
-            <div className="mockup-body">
-              <aside className="mockup-sidebar">
-                <div className="mockup-sidebar-title">Workspace</div>
-                <ul className="mockup-nav">
-                  <li className="active"><span className="mockup-nav-dot"></span>Dashboard</li>
-                  <li><span className="mockup-nav-dot"></span>Entities</li>
-                  <li><span className="mockup-nav-dot"></span>Policies</li>
-                  <li><span className="mockup-nav-dot"></span>Assets</li>
-                  <li><span className="mockup-nav-dot"></span>Expenses</li>
-                  <li><span className="mockup-nav-dot"></span>Renewals</li>
-                </ul>
-              </aside>
-              <div className="mockup-main">
-                <div className="mockup-h">Overview</div>
-                <div className="mockup-stats">
-                  <div className="mockup-stat">
-                    <div className="mockup-stat-label">Entities</div>
-                    <div className="mockup-stat-val">3</div>
-                  </div>
-                  <div className="mockup-stat">
-                    <div className="mockup-stat-label">Policies</div>
-                    <div className="mockup-stat-val">6</div>
-                  </div>
-                  <div className="mockup-stat">
-                    <div className="mockup-stat-label">Premium</div>
-                    <div className="mockup-stat-val cyan">$82k</div>
-                  </div>
+          <div className="mockup-wrap">
+            <div className="mockup">
+              <div className="browser-chrome">
+                <div className="browser-dots">
+                  <span></span><span></span><span></span>
                 </div>
-                <div className="mockup-section-title">Upcoming Renewals</div>
-                <div className="mockup-renewals">
-                  <div className="mockup-renewal">
-                    <div className="mockup-renewal-info">
-                      <div className="mockup-renewal-title">BOP — Hartford</div>
-                      <div className="mockup-renewal-sub">Acme Holdings LLC</div>
+                <div className="browser-url">app.policybrain.app — Dashboard</div>
+              </div>
+              <div className="mockup-body">
+                <aside className="mockup-sidebar">
+                  <div className="mockup-sidebar-title">Workspace</div>
+                  <ul className="mockup-nav">
+                    <li className="active"><span className="mockup-nav-dot"></span>Dashboard</li>
+                    <li><span className="mockup-nav-dot"></span>Entities</li>
+                    <li><span className="mockup-nav-dot"></span>Policies</li>
+                    <li><span className="mockup-nav-dot"></span>Assets</li>
+                    <li><span className="mockup-nav-dot"></span>Expenses</li>
+                    <li><span className="mockup-nav-dot"></span>Renewals</li>
+                  </ul>
+                </aside>
+                <div className="mockup-main">
+                  <div className="mockup-h">Overview</div>
+                  <div className="mockup-stats">
+                    <div className="mockup-stat">
+                      <div className="mockup-stat-label">Entities</div>
+                      <div className="mockup-stat-val"><Counter end={3} duration={1200} /></div>
                     </div>
-                    <div className="mockup-tag tag-red">4d</div>
+                    <div className="mockup-stat">
+                      <div className="mockup-stat-label">Policies</div>
+                      <div className="mockup-stat-val"><Counter end={6} duration={1400} /></div>
+                    </div>
+                    <div className="mockup-stat">
+                      <div className="mockup-stat-label">Premium</div>
+                      <div className="mockup-stat-val cyan">
+                        <Counter end={82} duration={1800} prefix="$" suffix="k" />
+                      </div>
+                    </div>
                   </div>
-                  <div className="mockup-renewal">
-                    <div className="mockup-renewal-info">
-                      <div className="mockup-renewal-title">Home — Chubb</div>
-                      <div className="mockup-renewal-sub">Personal</div>
+                  <div className="mockup-section-title">Upcoming Renewals</div>
+                  <div className="mockup-renewals">
+                    <div className="mockup-renewal">
+                      <div className="mockup-renewal-info">
+                        <div className="mockup-renewal-title">BOP — Hartford</div>
+                        <div className="mockup-renewal-sub">Acme Holdings LLC</div>
+                      </div>
+                      <div className="mockup-tag tag-red">4d</div>
                     </div>
-                    <div className="mockup-tag tag-yellow">12d</div>
-                  </div>
-                  <div className="mockup-renewal">
-                    <div className="mockup-renewal-info">
-                      <div className="mockup-renewal-title">Commercial Auto — Travelers</div>
-                      <div className="mockup-renewal-sub">Acme Holdings LLC</div>
+                    <div className="mockup-renewal">
+                      <div className="mockup-renewal-info">
+                        <div className="mockup-renewal-title">Home — Chubb</div>
+                        <div className="mockup-renewal-sub">Personal</div>
+                      </div>
+                      <div className="mockup-tag tag-yellow">12d</div>
                     </div>
-                    <div className="mockup-tag tag-cyan">18d</div>
+                    <div className="mockup-renewal">
+                      <div className="mockup-renewal-info">
+                        <div className="mockup-renewal-title">Commercial Auto — Travelers</div>
+                        <div className="mockup-renewal-sub">Acme Holdings LLC</div>
+                      </div>
+                      <div className="mockup-tag tag-cyan">18d</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -160,7 +259,11 @@ export default function Home() {
       </section>
 
       {/* FEATURES */}
-      <section id="features">
+      <section id="features" className="section-with-blobs">
+        <div className="section-blobs">
+          <div className="section-blob blob-a"></div>
+          <div className="section-blob blob-b"></div>
+        </div>
         <div className="container">
           <div className="section-header">
             <span className="section-label fade-in">Core Features</span>
@@ -300,7 +403,10 @@ export default function Home() {
       </section>
 
       {/* PRICING */}
-      <section id="pricing">
+      <section id="pricing" className="section-with-blobs">
+        <div className="section-blobs">
+          <div className="section-blob blob-c"></div>
+        </div>
         <div className="container">
           <div className="section-header center">
             <span className="section-label fade-in">Pricing</span>
